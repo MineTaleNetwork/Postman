@@ -1,0 +1,58 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'maven-publish'
+    id 'idea'
+    id 'java'
+}
+
+group 'cc.minetale'
+version 'LATEST'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    implementation("org.jetbrains:annotations:23.0.0")
+    compileOnly("org.projectlombok:lombok:1.18.22")
+    annotationProcessor("org.projectlombok:lombok:1.18.22")
+
+    implementation("com.google.code.gson:gson:2.9.0")
+    implementation("com.rabbitmq:amqp-client:5.14.2")
+    implementation("io.github.classgraph:classgraph:4.8.143")
+}
+
+configurations {
+    testImplementation.extendsFrom compileOnly
+}
+
+test {
+    useJUnitPlatform()
+}
+
+sourceCompatibility = 17
+targetCompatibility = 17
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+shadowJar {
+    classifier = null
+}
+
+publishing {
+    publications {
+        shadow(MavenPublication) { publication ->
+            project.shadow.component(publication)
+        }
+    }
+}
+
+tasks.withType(Jar) {
+    destinationDirectory = file("../../Build")
+}
+
+task buildJar(dependsOn: ['publishToMavenLocal'])
