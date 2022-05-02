@@ -15,44 +15,42 @@ repositories {
 
 dependencies {
     implementation("org.jetbrains:annotations:23.0.0")
-    compileOnly("org.projectlombok:lombok:1.18.22")
-    annotationProcessor("org.projectlombok:lombok:1.18.22")
+    compileOnly('org.projectlombok:lombok:1.18.24')
+    annotationProcessor("org.projectlombok:lombok:1.18.24")
 
     implementation("com.google.code.gson:gson:2.9.0")
     implementation("com.rabbitmq:amqp-client:5.14.2")
-    implementation("io.github.classgraph:classgraph:4.8.143")
 }
 
-configurations {
-    testImplementation.extendsFrom compileOnly
+compileJava.options.encoding('UTF-8')
+javadoc.options.encoding('UTF-8')
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
 }
 
-test {
-    useJUnitPlatform()
+shadowJar {
+    archiveClassifier.set(null)
 }
 
-sourceCompatibility = 17
-targetCompatibility = 17
+setSourceCompatibility(JavaVersion.VERSION_17)
+setTargetCompatibility(JavaVersion.VERSION_17)
 
 java {
     withJavadocJar()
     withSourcesJar()
 }
 
-shadowJar {
-    classifier = null
-}
+shadowJar.finalizedBy(javadocJar, sourcesJar)
 
 publishing {
     publications {
         shadow(MavenPublication) { publication ->
             project.shadow.component(publication)
+            artifacts = [ shadowJar, javadocJar, sourcesJar ]
         }
     }
 }
-
-tasks.withType(Jar) {
-    destinationDirectory = file("../../Build")
-}
-
-task buildJar(dependsOn: ['publishToMavenLocal'])

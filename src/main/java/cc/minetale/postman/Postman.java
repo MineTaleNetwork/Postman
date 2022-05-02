@@ -92,15 +92,11 @@ public class Postman {
 
         var payloadClass = payloadsRegistry.getPayloadById(payloadId);
 
-        System.out.println(payloadClass);
-
         if (payloadClass == null) { return; }
-
-        System.out.println(payloadData);
 
         var payload = gson.fromJson(payloadData, payloadClass);
 
-        if(unitId.equals(payload.getOrigin())) { return; }
+//        if(unitId.equals(payload.getOrigin())) { return; } // This allows for servers to receive their own payload.
 
         getListenersRegistry().callListeners(payload);
     }
